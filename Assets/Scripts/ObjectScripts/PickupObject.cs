@@ -1,3 +1,5 @@
+// Tested by Brian Spayd
+
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
