@@ -1,3 +1,5 @@
+// tested by Brian Spayd
+
 using UnityEngine;
 using System;
 using System.Collections;
@@ -153,8 +155,10 @@ public class SpawnObjects : MonoBehaviour
         SpawnPointHolder spawnPointHolder = spawnedObject.GetComponent<SpawnPointHolder>() ?? spawnedObject.AddComponent<SpawnPointHolder>();
         spawnPointHolder.spawnPoint = spawnPoint;
 
-        // Add PickupObject if missing
+        // Add PickupObject if missing and set health to 100
         PickupObject pickup = spawnedObject.GetComponent<PickupObject>() ?? spawnedObject.AddComponent<PickupObject>();
+        pickup.Health = 100;
+        Debug.Log($"Initialized {spawnedObject.name} with Health: {pickup.Health}");
 
         // Parent Light/Medium objects to spawn point's parent
         if (spawnPoint.parent != null && (string.Equals(spawnedObject.tag, "Light", StringComparison.OrdinalIgnoreCase) || string.Equals(spawnedObject.tag, "Medium", StringComparison.OrdinalIgnoreCase)))
