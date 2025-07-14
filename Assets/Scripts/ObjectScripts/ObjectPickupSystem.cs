@@ -31,10 +31,10 @@ public class ObjectPickupSystem : MonoBehaviour
     private float doorCurrentAngle; // Current rotation angle for Door
     private bool interactInput;
     private bool throwInput;
+    private readonly Collider[] overlapResults = new Collider[8]; // Cached array for overlap checks
 
     private void Awake()
     {
-        // Ensure playerCamera is assigned
         if (playerCamera == null)
         {
             playerCamera = GetComponentInChildren<Camera>();
@@ -58,10 +58,9 @@ public class ObjectPickupSystem : MonoBehaviour
 
     private bool GetHoldPointPosition(out Vector3 position)
     {
-        // Raycast from camera to determine hold point
         Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
         bool isValid = true;
-        if (Physics.Raycast(ray, out RaycastHit hit, maxHoldDistance, holdLayer))
+        if (Physics.Raycast(ray, out RaycastHit hit, maxHoldDistance, holdLayer, QueryTriggerInteraction.Ignore))
         {
             float distanceToSurface = Vector3.Distance(playerCamera.transform.position, hit.point);
             if (distanceToSurface < minHoldDistance)
@@ -82,12 +81,8 @@ public class ObjectPickupSystem : MonoBehaviour
     {
         if (interactInput && heldObject == null && interactingObject == null)
         {
-            // Visualize pickup raycast
-            Debug.DrawRay(playerCamera.transform.position, playerCamera.transform.forward * pickupRange, Color.red, 1f);
-
-            // Try to interact with an object
             Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
-            if (Physics.SphereCast(ray, pickupRadius, out RaycastHit hit, pickupRange, pickupLayer))
+            if (Physics.SphereCast(ray, pickupRadius, out RaycastHit hit, pickupRange, pickupLayer, QueryTriggerInteraction.Ignore))
             {
                 IObject pickupObject = hit.collider.GetComponent<IObject>();
                 if (pickupObject != null)
@@ -97,38 +92,30 @@ public class ObjectPickupSystem : MonoBehaviour
 
                     if (tag == "Light" || tag == "Medium")
                     {
-                        // Pick up Light or Medium objects
                         if (GetHoldPointPosition(out Vector3 holdPosition))
                         {
                             heldObject = targetObject;
                             heldObjectRb = heldObject.GetComponent<Rigidbody>();
                             heldObjectInterface = pickupObject;
 
-                            // Disable physics while held
                             heldObjectRb.isKinematic = true;
                             heldObjectRb.useGravity = false;
 
-                            // Position at hold point with player-relative rotation
                             heldObject.transform.position = holdPosition;
                             heldObject.transform.rotation = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
 
-                            // Notify object of pickup
                             heldObjectInterface.OnPickup();
-                            Debug.Log($"Picked up: {heldObject.name}", heldObject);
                         }
                     }
                     else if (tag == "Heavy")
                     {
-                        // Start pushing Heavy object
                         interactingObject = targetObject;
                         interactingObjectRb = interactingObject.GetComponent<Rigidbody>();
                         heldObjectInterface = pickupObject;
                         heldObjectInterface.OnPickup();
-                        Debug.Log($"Started pushing: {interactingObject.name}", interactingObject);
                     }
                     else if (tag == "Door")
                     {
-                        // Start pulling Door
                         interactingObject = targetObject;
                         interactingObjectRb = interactingObject.GetComponent<Rigidbody>();
                         heldObjectInterface = pickupObject;
@@ -136,16 +123,14 @@ public class ObjectPickupSystem : MonoBehaviour
                         doorInitialRotation = interactingObject.transform.rotation;
                         doorCurrentAngle = 0f;
                         heldObjectInterface.OnPickup();
-                        Debug.Log($"Started pulling: {interactingObject.name}", interactingObject);
                     }
                 }
             }
         }
         else if (throwInput && heldObject == null)
         {
-            // Push any object in view when throw is triggered and no object is held
             Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
-            if (Physics.SphereCast(ray, pickupRadius, out RaycastHit hit, pickupRange, pickupLayer))
+            if (Physics.SphereCast(ray, pickupRadius, out RaycastHit hit, pickupRange, pickupLayer, QueryTriggerInteraction.Ignore))
             {
                 GameObject targetObject = hit.collider.gameObject;
                 Rigidbody rb = targetObject.GetComponent<Rigidbody>();
@@ -161,9 +146,8 @@ public class ObjectPickupSystem : MonoBehaviour
                         _ => 0f
                     };
                     Vector3 pushDirection = playerCamera.transform.forward;
-                    if (tag != "Door") pushDirection.y = 0f; // Keep push horizontal for non-Doors
+                    if (tag != "Door") pushDirection.y = 0f;
                     rb.AddForce(pushDirection.normalized * pushForce, ForceMode.Impulse);
-                    Debug.Log($"Pushed {targetObject.name} with force {pushForce} (Tag: {tag})", targetObject);
                 }
             }
         }
@@ -171,12 +155,10 @@ public class ObjectPickupSystem : MonoBehaviour
         {
             if (throwInput)
             {
-                // Throw Light or Medium object
                 ThrowObject();
             }
             else if (interactInput)
             {
-                // Drop Light or Medium object
                 DropObject();
             }
         }
@@ -184,103 +166,83 @@ public class ObjectPickupSystem : MonoBehaviour
         {
             if (throwInput && interactingObject.CompareTag("Heavy"))
             {
-                // Push Heavy object
                 PushObject();
             }
             else if (interactInput)
             {
-                // Stop interacting with Heavy or Door
                 StopInteracting();
             }
         }
 
-        interactInput = false; // Reset interact input
-        throwInput = false; // Reset throw input
+        interactInput = false;
+        throwInput = false;
     }
 
     private void UpdateHeldObject()
     {
-        if (heldObject != null)
+        if (heldObject == null) return;
+
+        if (!GetHoldPointPosition(out Vector3 holdPosition))
         {
-            // Get hold point position
-            if (!GetHoldPointPosition(out Vector3 holdPosition))
-            {
-                // Hold point too close to surface, drop object
-                DropObject();
-                return;
-            }
-
-            // Check for floor penetration
-            Debug.DrawRay(heldObject.transform.position, Vector3.down * floorCheckDistance, Color.green, 1f);
-            if (Physics.Raycast(heldObject.transform.position, Vector3.down, out RaycastHit floorHit, floorCheckDistance, holdLayer))
-            {
-                float minHeight = floorHit.point.y + objectRadius;
-                if (holdPosition.y < minHeight)
-                {
-                    holdPosition.y = minHeight;
-                    Debug.Log($"Adjusted {heldObject.name} above floor at {minHeight}", heldObject);
-                }
-            }
-
-            // Check for wall overlap
-            if (Physics.OverlapSphere(holdPosition, objectRadius, holdLayer).Length > 0)
-            {
-                // Object would intersect a wall, drop it
-                DropObject();
-                return;
-            }
-
-            // Move held object to hold point with player-relative rotation
-            heldObject.transform.position = holdPosition;
-            heldObject.transform.rotation = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
+            DropObject();
+            return;
         }
+
+        if (Physics.Raycast(heldObject.transform.position, Vector3.down, out RaycastHit floorHit, floorCheckDistance, holdLayer, QueryTriggerInteraction.Ignore))
+        {
+            float minHeight = floorHit.point.y + objectRadius;
+            if (holdPosition.y < minHeight)
+            {
+                holdPosition.y = minHeight;
+            }
+        }
+
+        int overlapCount = Physics.OverlapSphereNonAlloc(holdPosition, objectRadius, overlapResults, holdLayer, QueryTriggerInteraction.Ignore);
+        if (overlapCount > 0)
+        {
+            DropObject();
+            return;
+        }
+
+        heldObject.transform.SetPositionAndRotation(holdPosition, Quaternion.Euler(0f, transform.eulerAngles.y, 0f));
     }
 
     private void UpdateInteractingObject()
     {
-        if (interactingObject != null && interactingObject.CompareTag("Door"))
+        if (interactingObject == null || !interactingObject.CompareTag("Door")) return;
+
+        if (doorHinge != null)
         {
-            if (doorHinge != null)
+            float inputDirection = interactInput ? 1f : 0f;
+            float targetVelocity = inputDirection * doorPullSpeed;
+            JointMotor motor = doorHinge.motor;
+            motor.targetVelocity = targetVelocity;
+            doorHinge.motor = motor;
+        }
+        else
+        {
+            float rotationAmount = doorPullSpeed * Time.fixedDeltaTime;
+            doorCurrentAngle += rotationAmount;
+            if (doorCurrentAngle <= doorMaxAngle)
             {
-                // Use HingeJoint to control door rotation
-                float inputDirection = interactInput ? 1f : 0f; // Pull when interact is held
-                float targetVelocity = inputDirection * doorPullSpeed;
-                JointMotor motor = doorHinge.motor;
-                motor.targetVelocity = targetVelocity;
-                doorHinge.motor = motor;
+                interactingObject.transform.rotation = doorInitialRotation * Quaternion.Euler(0f, rotationAmount, 0f);
             }
             else
             {
-                // Fallback to manual rotation if no HingeJoint
-                float rotationAmount = doorPullSpeed * Time.fixedDeltaTime;
-                doorCurrentAngle += rotationAmount;
-                if (doorCurrentAngle <= doorMaxAngle)
-                {
-                    interactingObject.transform.rotation = doorInitialRotation * Quaternion.Euler(0f, rotationAmount, 0f);
-                }
-                else
-                {
-                    // Stop pulling if max angle reached
-                    StopInteracting();
-                }
+                StopInteracting();
             }
         }
     }
 
     private void DropObject()
     {
-        // Drop the held object (Light/Medium)
         heldObjectRb.isKinematic = false;
         heldObjectRb.useGravity = true;
 
-        // Apply slight forward velocity
         float dropForce = heldObject.CompareTag("Light") ? lightThrowForce : mediumThrowForce;
         heldObjectRb.AddForce(playerCamera.transform.forward * dropForce * 0.2f, ForceMode.Impulse);
 
-        // Notify object of drop
         heldObjectInterface.OnDrop();
-        Debug.Log($"Dropped: {heldObject.name}", heldObject);
-
         heldObject = null;
         heldObjectRb = null;
         heldObjectInterface = null;
@@ -288,18 +250,13 @@ public class ObjectPickupSystem : MonoBehaviour
 
     private void ThrowObject()
     {
-        // Throw the held object (Light/Medium)
         heldObjectRb.isKinematic = false;
         heldObjectRb.useGravity = true;
 
-        // Apply throw force based on tag
         float throwForce = heldObject.CompareTag("Light") ? lightThrowForce : mediumThrowForce;
         heldObjectRb.AddForce(playerCamera.transform.forward * throwForce, ForceMode.Impulse);
 
-        // Notify object of drop
         heldObjectInterface.OnDrop();
-        Debug.Log($"Threw: {heldObject.name}", heldObject);
-
         heldObject = null;
         heldObjectRb = null;
         heldObjectInterface = null;
@@ -307,23 +264,17 @@ public class ObjectPickupSystem : MonoBehaviour
 
     private void PushObject()
     {
-        // Push Heavy object
         Vector3 pushDirection = playerCamera.transform.forward;
-        pushDirection.y = 0f; // Keep push horizontal
+        pushDirection.y = 0f;
         interactingObjectRb.AddForce(pushDirection.normalized * heavyPushForce, ForceMode.Impulse);
-        Debug.Log($"Pushed: {interactingObject.name}", interactingObject);
-
-        // Stop interacting after push
         StopInteracting();
     }
 
     private void StopInteracting()
     {
-        // Stop interacting with Heavy or Door
         if (interactingObject != null)
         {
             heldObjectInterface.OnDrop();
-            Debug.Log($"Stopped interacting with: {interactingObject.name}", interactingObject);
         }
 
         interactingObject = null;
