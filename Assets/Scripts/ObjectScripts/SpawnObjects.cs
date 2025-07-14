@@ -11,7 +11,7 @@ public class SpawnObjects : MonoBehaviour
     [System.Serializable]
     public struct SpawnableObject
     {
-        public GameObject prefab; // Prefab to spawn, weight type inferred from tag
+        public GameObject prefab; // Prefab to spawn 
     }
 
     [Header("Spawn Settings")]
