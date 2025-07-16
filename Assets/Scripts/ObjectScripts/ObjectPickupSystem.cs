@@ -9,14 +9,18 @@ public class ObjectPickupSystem : MonoBehaviour
     public float pickupRadius = 0.2f; // Radius for sphere cast
     public float maxHoldDistance = 2f; // Max distance for held objects
     public float minHoldDistance = 0.2f; // Min distance from surfaces
-    public float lightThrowForce = 5f; // Throw/push force for Light objects
-    public float mediumThrowForce = 2f; // Throw/push force for Medium objects
+    public float lightThrowForce = 5f; // Base throw/push force for Light objects
+    public float mediumThrowForce = 2f; // Base throw/push force for Medium objects
     public float heavyPushForce = 10f; // Push force for Heavy objects
     public float doorPushForce = 5f; // Push force for Door objects
     public float doorPullSpeed = 90f; // Rotation speed for Door (degrees/sec)
     public float doorMaxAngle = 90f; // Max rotation angle for Door
     public float floorCheckDistance = 1f; // Distance to check for floor
     public float objectRadius = 0.3f; // Approx. object size
+    public float rotationSensitivity = 1f; // Scroll wheel rotation sensitivity, editable in Inspector
+    [Header("Throw Charge Settings")]
+    public float maxThrowForceMultiplier = 2f; // Max multiplier for throw force (e.g., 2x base force)
+    public float maxChargeTime = 1f; // Time (seconds) to reach max charge
     public LayerMask pickupLayer; // Layer for pickable objects
     public LayerMask holdLayer; // Layers for hold point and floor
     public Camera playerCamera; // Reference to player's camera
@@ -31,6 +35,11 @@ public class ObjectPickupSystem : MonoBehaviour
     private float doorCurrentAngle; // Current rotation angle for Door
     private bool interactInput;
     private bool throwInput;
+    private float throwChargeTime; // Current charge duration for throw
+    private bool isChargingThrow; // Whether throw input is being held
+    private enum RotationAxis { X, Y } // Enum for rotation axis
+    private RotationAxis currentRotationAxis = RotationAxis.Y; // Current rotation axis
+    private Vector3 rotationOffset = Vector3.zero; // Rotation offset for X, Y, Z axes
     private readonly Collider[] overlapResults = new Collider[8]; // Cached array for overlap checks
 
     private void Awake()
@@ -48,6 +57,14 @@ public class ObjectPickupSystem : MonoBehaviour
     private void Update()
     {
         HandleInteraction();
+        if (heldObject != null)
+        {
+            RotateObject();
+            if (isChargingThrow)
+            {
+                throwChargeTime += Time.deltaTime; // Accumulate charge time
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -84,8 +101,7 @@ public class ObjectPickupSystem : MonoBehaviour
             Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
             if (Physics.SphereCast(ray, pickupRadius, out RaycastHit hit, pickupRange, pickupLayer, QueryTriggerInteraction.Ignore))
             {
-                IObject pickupObject = hit.collider.GetComponent<IObject>();
-                if (pickupObject != null)
+                if (hit.collider.TryGetComponent<IObject>(out var pickupObject))
                 {
                     GameObject targetObject = pickupObject.GameObject;
                     string tag = targetObject.tag;
@@ -100,9 +116,11 @@ public class ObjectPickupSystem : MonoBehaviour
 
                             heldObjectRb.isKinematic = true;
                             heldObjectRb.useGravity = false;
+                            heldObjectRb.angularVelocity = Vector3.zero; // Reset angular velocity
 
                             heldObject.transform.position = holdPosition;
                             heldObject.transform.rotation = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
+                            rotationOffset = Vector3.zero; // Reset rotation offset on pickup
 
                             heldObjectInterface.OnPickup();
                         }
@@ -133,8 +151,7 @@ public class ObjectPickupSystem : MonoBehaviour
             if (Physics.SphereCast(ray, pickupRadius, out RaycastHit hit, pickupRange, pickupLayer, QueryTriggerInteraction.Ignore))
             {
                 GameObject targetObject = hit.collider.gameObject;
-                Rigidbody rb = targetObject.GetComponent<Rigidbody>();
-                if (rb != null)
+                if (targetObject.TryGetComponent<Rigidbody>(out var rb))
                 {
                     string tag = targetObject.tag;
                     float pushForce = tag switch
@@ -204,7 +221,17 @@ public class ObjectPickupSystem : MonoBehaviour
             return;
         }
 
-        heldObject.transform.SetPositionAndRotation(holdPosition, Quaternion.Euler(0f, transform.eulerAngles.y, 0f));
+        // Make the held object maintain rotation offset relative to player camera
+        Vector3 directionToPlayer = (playerCamera.transform.position - holdPosition).normalized;
+        directionToPlayer.y = 0f; // Keep object upright
+        if (directionToPlayer != Vector3.zero)
+        {
+            Quaternion baseRotation = Quaternion.LookRotation(directionToPlayer, Vector3.up);
+            Quaternion targetRotation = baseRotation * Quaternion.Euler(rotationOffset);
+            heldObject.transform.rotation = targetRotation;
+        }
+
+        heldObject.transform.position = holdPosition;
     }
 
     private void UpdateInteractingObject()
@@ -238,6 +265,8 @@ public class ObjectPickupSystem : MonoBehaviour
     {
         heldObjectRb.isKinematic = false;
         heldObjectRb.useGravity = true;
+        heldObjectRb.linearVelocity = Vector3.zero; // Clear linear velocity
+        heldObjectRb.angularVelocity = Vector3.zero; // Clear angular velocity
 
         float dropForce = heldObject.CompareTag("Light") ? lightThrowForce : mediumThrowForce;
         heldObjectRb.AddForce(playerCamera.transform.forward * dropForce * 0.2f, ForceMode.Impulse);
@@ -246,20 +275,28 @@ public class ObjectPickupSystem : MonoBehaviour
         heldObject = null;
         heldObjectRb = null;
         heldObjectInterface = null;
+        rotationOffset = Vector3.zero; // Reset offset on drop
     }
 
     private void ThrowObject()
     {
         heldObjectRb.isKinematic = false;
         heldObjectRb.useGravity = true;
+        heldObjectRb.linearVelocity = Vector3.zero; // Clear linear velocity
+        heldObjectRb.angularVelocity = Vector3.zero; // Clear angular velocity
 
-        float throwForce = heldObject.CompareTag("Light") ? lightThrowForce : mediumThrowForce;
+        float baseThrowForce = heldObject.CompareTag("Light") ? lightThrowForce : mediumThrowForce;
+        float chargeFactor = Mathf.Clamp01(throwChargeTime / maxChargeTime); // 0 to 1 based on hold time
+        float throwForce = baseThrowForce * (1f + chargeFactor * (maxThrowForceMultiplier - 1f)); // Scale from base to max
         heldObjectRb.AddForce(playerCamera.transform.forward * throwForce, ForceMode.Impulse);
 
         heldObjectInterface.OnDrop();
         heldObject = null;
         heldObjectRb = null;
         heldObjectInterface = null;
+        rotationOffset = Vector3.zero; // Reset offset on throw
+        throwChargeTime = 0f; // Reset charge
+        isChargingThrow = false; // Reset charging state
     }
 
     private void PushObject()
@@ -268,6 +305,25 @@ public class ObjectPickupSystem : MonoBehaviour
         pushDirection.y = 0f;
         interactingObjectRb.AddForce(pushDirection.normalized * heavyPushForce, ForceMode.Impulse);
         StopInteracting();
+    }
+
+    private void RotateObject()
+    {
+        if (heldObject == null) return;
+
+        Vector2 scrollDelta = Mouse.current.scroll.ReadValue();
+        float rotationAmount = scrollDelta.y * rotationSensitivity * Time.deltaTime;
+
+        // Update rotation offset based on current axis
+        switch (currentRotationAxis)
+        {
+            case RotationAxis.X:
+                rotationOffset.x += rotationAmount;
+                break;
+            case RotationAxis.Y:
+                rotationOffset.y += rotationAmount;
+                break;
+        }
     }
 
     private void StopInteracting()
@@ -290,6 +346,41 @@ public class ObjectPickupSystem : MonoBehaviour
 
     public void OnThrow(InputAction.CallbackContext context)
     {
-        throwInput = context.performed;
+        if (context.started)
+        {
+            isChargingThrow = true; // Start charging
+            throwChargeTime = 0f; // Reset charge time
+        }
+        else if (context.performed)
+        {
+            throwInput = true; // Trigger throw
+        }
+        else if (context.canceled)
+        {
+            isChargingThrow = false; // Stop charging
+            throwChargeTime = 0f; // Reset charge time
+        }
+    }
+
+    public void OnRotate(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            if (context.duration < 0.2f) // Tap: cycle rotation axis
+            {
+                currentRotationAxis = currentRotationAxis switch
+                {
+                    RotationAxis.X => RotationAxis.Y,
+                    RotationAxis.Y => RotationAxis.X,
+                    _ => RotationAxis.Y
+                };
+                Debug.Log($"Rotation Axis Changed to: {currentRotationAxis}");
+            }
+            else if (heldObject != null) // Hold: reset rotation
+            {
+                rotationOffset = Vector3.zero;
+                Debug.Log("Reset rotation to upright position");
+            }
+        }
     }
 }
