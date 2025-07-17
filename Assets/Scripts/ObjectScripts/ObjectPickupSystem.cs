@@ -199,6 +199,8 @@ public class ObjectPickupSystem : MonoBehaviour
     {
         if (heldObject == null) return;
 
+        heldObjectRb.useGravity = false; // added for redundancy?
+
         if (!GetHoldPointPosition(out Vector3 holdPosition))
         {
             DropObject();
