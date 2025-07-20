@@ -1,8 +1,12 @@
 fileFormatVersion: 2
+<<<<<<<< Updated upstream:Assets/Brandons Textures/Dark stone.mat.meta
 guid: 7b13782abbd166e41b2768fabe3792f4
+========
+guid: 1bc6ca61fab15ba41b41c4c70aac1df0
+>>>>>>>> Stashed changes:Assets/2d Images/House Layout 2.mat.meta
 NativeFormatImporter:
   externalObjects: {}
-  mainObjectFileID: 2100000
+  mainObjectFileID: 0
   userData: 
   assetBundleName: 
   assetBundleVariant: 
