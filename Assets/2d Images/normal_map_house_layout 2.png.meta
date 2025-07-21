@@ -1,5 +1,13 @@
 fileFormatVersion: 2
+<<<<<<< Updated upstream
 guid: 0787c3d05598eda4cbcc481d8ba9cdcd
+=======
+<<<<<<<< Updated upstream:Assets/2d Images/MTFO.png.meta
+guid: cc22cefb62925534bb27dc2c8a561c84
+========
+guid: 717412962c7b8644f9f2d9b20b1be56c
+>>>>>>>> Stashed changes:Assets/2d Images/normal_map_house_layout 2.png.meta
+>>>>>>> Stashed changes
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

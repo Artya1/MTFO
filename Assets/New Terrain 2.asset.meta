@@ -1,5 +1,13 @@
 fileFormatVersion: 2
+<<<<<<< Updated upstream
+<<<<<<<< Updated upstream:Assets/New Terrain 2.asset.meta
 guid: 9df8688b7a00d0d4da3fe01258998141
+========
+guid: 9bd02b69c6cc26c4094ad6b79414cc5f
+>>>>>>>> Stashed changes:Assets/UnityFigmaBridgeSettings.asset.meta
+=======
+guid: a92178cec585a6d4fa73d73eb99d5012
+>>>>>>> Stashed changes
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 0
