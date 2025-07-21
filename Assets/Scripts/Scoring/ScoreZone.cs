@@ -1,5 +1,3 @@
-// tested by Brian Spayd
-
 using UnityEngine;
 using System.Collections.Generic;
 
@@ -9,8 +7,9 @@ public class ScoreZone : MonoBehaviour
     private BoxCollider boxCollider;
     private HashSet<GameObject> scoredObjects = new HashSet<GameObject>(); // Track objects in zone
     private bool isPlayerInZone; // Track player presence
+    private float dollarAmount; // Dollar amount based on total score
 
-    void Start()
+    void Awake()
     {
         boxCollider = GetComponent<BoxCollider>();
         boxCollider.isTrigger = true; // Ensure collider is a trigger
@@ -18,7 +17,6 @@ public class ScoreZone : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        // Check if the entering object is the player
         if (other.CompareTag("Player"))
         {
             isPlayerInZone = true;
@@ -26,30 +24,24 @@ public class ScoreZone : MonoBehaviour
             return;
         }
 
-        // Check for PickupObject on the entering object
-        PickupObject pickup = other.GetComponent<PickupObject>();
-        if (pickup != null && !scoredObjects.Contains(pickup.GameObject))
+        if (other.TryGetComponent<PickupObject>(out var pickup) && scoredObjects.Add(pickup.GameObject))
         {
-            scoredObjects.Add(pickup.GameObject);
             LogTotalScore();
         }
     }
 
     void OnTriggerExit(Collider other)
     {
-        // Update player presence
         if (other.CompareTag("Player"))
         {
             isPlayerInZone = false;
+            LogTotalScore();
+            return;
         }
-        // Remove object when it exits
-        else
+
+        if (other.TryGetComponent<PickupObject>(out var pickup) && scoredObjects.Remove(pickup.GameObject))
         {
-            PickupObject pickup = other.GetComponent<PickupObject>();
-            if (pickup != null && scoredObjects.Remove(pickup.GameObject))
-            {
-                LogTotalScore();
-            }
+            LogTotalScore();
         }
     }
 
@@ -58,12 +50,16 @@ public class ScoreZone : MonoBehaviour
         int totalScore = 0;
         foreach (GameObject obj in scoredObjects)
         {
-            PickupObject pickup = obj.GetComponent<PickupObject>();
-            if (pickup != null)
+            if (obj != null && obj.TryGetComponent<PickupObject>(out var pickup))
             {
                 totalScore += pickup.Score;
             }
         }
-        Debug.Log($"ScoreZone: Total Score of {scoredObjects.Count} overlapping objects: {totalScore}");
+        dollarAmount = totalScore / 100f; // Convert score to dollar amount
+        if (Debug.isDebugBuild)
+        {
+            Debug.Log($"ScoreZone: Total Score of {scoredObjects.Count} overlapping objects: {totalScore}");
+            Debug.Log($"ScoreZone: Dollar amount = ${dollarAmount:F2}");
+        }
     }
 }

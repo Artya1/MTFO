@@ -6,7 +6,7 @@ public class PickupObject : MonoBehaviour, IObject
     public int health = 100; // Default health value, editable in Inspector
     public int score = 100; // Deprecated, kept for Inspector compatibility but unused
     public float scoreMultiplier = 1f; // Custom multiplier for score, editable in Inspector
-    public GameObject prefab; // Prefab to replace this object's model, editable in Inspector
+    // public GameObject prefab; Prefab to replace this object's model, editable in Inspector
     public float minForceThreshold = 5f; // Minimum force to cause damage, editable in Inspector
     public float verticalChangeThreshold = 1f; // Minimum vertical change to trigger interaction, editable in Inspector
     public float positionCheckInterval = 0.5f; // Interval for position checks, editable in Inspector
