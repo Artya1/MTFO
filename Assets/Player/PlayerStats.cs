@@ -2,15 +2,22 @@ using UnityEngine;
 
 public class PlayerStats : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public int health;
 
-    // Update is called once per frame
-    void Update()
+    void Awake()
     {
-        
+        health = 100;
     }
+    public void dmgTaken(int damage)
+    {
+        health -= damage;
+        Debug.Log("Health: " + health);
+        if (health <= 0)
+        {
+            Destroy(gameObject);
+        }
+    }
+    
+    
+
 }
