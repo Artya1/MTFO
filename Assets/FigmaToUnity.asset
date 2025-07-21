@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf3fa248d460454482c87c44b865bd46, type: 3}
+  m_Name: FigmaToUnity
+  m_EditorClassIdentifier: 
+  _figmaToken: figd_nVpLHdvvkqM2Uqkb9svaS6cKEYoruIcQuGJaf4G1
+  _savePath: Assets/YG UI ELEMENTS
+  _requestImageDataList:
+    _data:
+    - rid: 5633079902617206985
+  _requestProgress: 1
+  _isRequestProcessing: 0
+  _requestProgressText: Completed
+  references:
+    version: 2
+    RefIds:
+    - rid: 5633079902617206985
+      type: {class: UpdateImageData, ns: LazyRedpaw.FigmaToUnity, asm: LazyRedpaw.FigmaToUnity.Editor}
+      data:
+        _url: https://www.figma.com/design/BSH5sqoSrSrMAeu8QSGOJs/MTFO-moodboard?node-id=36-680&t=CL6QDWVOd0Gv3YAx-4
+        _figmaId: 
+        _assetPath: Assets/YG UI ELEMENTS/START Button.png
+        _name: Options Button
+        _image: {fileID: 2800000, guid: c30898a584d49c0489fd4ed1c0a4585b, type: 3}
+        _isIncluded: 1
+        _needDeleteImage: 0

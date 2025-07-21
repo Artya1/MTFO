@@ -1,5 +1,17 @@
 fileFormatVersion: 2
+<<<<<<< Updated upstream
+<<<<<<<< Updated upstream:Assets/Scenes/Aryan_Sceme 2.unity.meta
 guid: b656010ed903d0242b39c7b251b1b841
+========
+guid: 503ff1788ee3f8048bf7d3e01cdcb2a8
+>>>>>>>> Stashed changes:Assets/Scenes/Brandon Scene 2.unity.meta
+=======
+<<<<<<<< Updated upstream:Assets/Scenes/Alpha 1.1 Brandon.unity.meta
+guid: c635f845a19d10147aeb14fa67e7b2cd
+========
+guid: 2bbc023d94a85404d843c072c263926a
+>>>>>>>> Stashed changes:Assets/Scenes/Aryan_Sceme 2.unity.meta
+>>>>>>> Stashed changes
 DefaultImporter:
   externalObjects: {}
   userData: 

@@ -1,5 +1,17 @@
 fileFormatVersion: 2
+<<<<<<< Updated upstream
+<<<<<<<< Updated upstream:Assets/ModularFirstPersonController/DemoScene/Gridbox Prototype Materials/Resources/ProBuilder Data/Default Material Palette 2.asset.meta
 guid: 6842d051208d12441b100bcd9bceb9f2
+========
+guid: 5805582698548e247815ef7e48de2336
+>>>>>>>> Stashed changes:Assets/FigmaToUnity.asset.meta
+=======
+<<<<<<<< Updated upstream:Assets/2d Images/House Layout 2.mat.meta
+guid: 71881d649bb852a4fbe01828db44a087
+========
+guid: 793d0492ba9f7cb47a91171026debff5
+>>>>>>>> Stashed changes:Assets/ModularFirstPersonController/DemoScene/Gridbox Prototype Materials/Resources/ProBuilder Data/Default Material Palette 2.asset.meta
+>>>>>>> Stashed changes
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 0

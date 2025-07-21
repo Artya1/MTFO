@@ -1,5 +1,17 @@
 fileFormatVersion: 2
+<<<<<<< Updated upstream
+<<<<<<<< Updated upstream:Assets/Prefabs/Cylinder 2.prefab.meta
 guid: 2cc3e743e0e7b6c45a1fda92e7318043
+========
+guid: f27da9451f30e604297e55c0bb01bd26
+>>>>>>>> Stashed changes:Assets/Prefabs/Door 2.prefab.meta
+=======
+<<<<<<<< Updated upstream:Assets/MTFO! Truck.prefab.meta
+guid: 3d30e217eddd01d4881c01dfa2c86dcb
+========
+guid: 9670f55ec0d0a4749b24918d3bca8b83
+>>>>>>>> Stashed changes:Assets/Prefabs/Cylinder 2.prefab.meta
+>>>>>>> Stashed changes
 PrefabImporter:
   externalObjects: {}
   userData: 
