@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine.SocialPlatforms.Impl;
 
 [RequireComponent(typeof(BoxCollider))]
 public class ScoreZone : MonoBehaviour
@@ -7,7 +9,9 @@ public class ScoreZone : MonoBehaviour
     private BoxCollider boxCollider;
     private HashSet<GameObject> scoredObjects = new HashSet<GameObject>(); // Track objects in zone
     private bool isPlayerInZone; // Track player presence
-    private float dollarAmount; // Dollar amount based on total score
+    public float dollarAmount; // Dollar amount based on total score
+
+    public TMP_Text scoreText;
 
     void Awake()
     {
@@ -56,6 +60,7 @@ public class ScoreZone : MonoBehaviour
             }
         }
         dollarAmount = totalScore / 100f; // Convert score to dollar amount
+        scoreText.text = $"Total Score:{dollarAmount}$";
         if (Debug.isDebugBuild)
         {
             Debug.Log($"ScoreZone: Total Score of {scoredObjects.Count} overlapping objects: {totalScore}");

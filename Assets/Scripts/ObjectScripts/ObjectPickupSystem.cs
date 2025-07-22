@@ -354,7 +354,7 @@ public class ObjectPickupSystem : MonoBehaviour
     {
         interactInput = context.performed;
     }
-
+   
     public void OnThrow(InputAction.CallbackContext context)
     {
         if (context.started)

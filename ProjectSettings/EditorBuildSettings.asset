@@ -8,10 +8,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Alpha 1.0/Alpha1.0.unity
     guid: 52ce45d70d0c9154eac9999af4d164cb
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Aryan_Sceme.unity
     guid: e082315218744d7449356eeaac32f8f2
   - enabled: 1
