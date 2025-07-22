@@ -1,5 +1,13 @@
 fileFormatVersion: 2
+<<<<<<< Updated upstream
 guid: 1447df7f8967482498b1c591a456e9c9
+=======
+<<<<<<<< Updated upstream:Assets/Prefabs/Front wall 2.prefab.meta
+guid: 6c115e5efe7435841a908771a581df95
+========
+guid: 126c289a0edf2cb418e2d6ff95d16c14
+>>>>>>>> Stashed changes:Assets/Prefabs/Stairs 2.prefab.meta
+>>>>>>> Stashed changes
 PrefabImporter:
   externalObjects: {}
   userData: 

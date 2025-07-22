@@ -1,5 +1,17 @@
 fileFormatVersion: 2
+<<<<<<< Updated upstream
+<<<<<<<< Updated upstream:Assets/Prefabs/Front wall 2.prefab.meta
 guid: 6c115e5efe7435841a908771a581df95
+========
+guid: 126c289a0edf2cb418e2d6ff95d16c14
+>>>>>>>> Stashed changes:Assets/Prefabs/Stairs 2.prefab.meta
+=======
+<<<<<<<< Updated upstream:Assets/Prefabs/Door 2.prefab.meta
+guid: 054d7acbaa6c9bf4dbf13e8426ae04ad
+========
+guid: 4ecca5504176d274f9a47207f9f3ce8a
+>>>>>>>> Stashed changes:Assets/Prefabs/Front wall 2.prefab.meta
+>>>>>>> Stashed changes
 PrefabImporter:
   externalObjects: {}
   userData: 

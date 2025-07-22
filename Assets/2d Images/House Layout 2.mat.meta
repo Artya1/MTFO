@@ -1,5 +1,17 @@
 fileFormatVersion: 2
+<<<<<<< Updated upstream
+<<<<<<<< Updated upstream:Assets/2d Images/House Layout 2.mat.meta
 guid: 71881d649bb852a4fbe01828db44a087
+========
+guid: 793d0492ba9f7cb47a91171026debff5
+>>>>>>>> Stashed changes:Assets/ModularFirstPersonController/DemoScene/Gridbox Prototype Materials/Resources/ProBuilder Data/Default Material Palette 2.asset.meta
+=======
+<<<<<<<< Updated upstream:Assets/Brandons Textures/Dark stone.mat.meta
+guid: 7b13782abbd166e41b2768fabe3792f4
+========
+guid: 1bc6ca61fab15ba41b41c4c70aac1df0
+>>>>>>>> Stashed changes:Assets/2d Images/House Layout 2.mat.meta
+>>>>>>> Stashed changes
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 0

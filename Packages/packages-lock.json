@@ -1,5 +1,20 @@
 {
   "dependencies": {
+    "com.lazyredpaw.figmatounity": {
+      "version": "https://github.com/Redpaw-Game-Dev/FigmaToUnity.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.2.1"
+      },
+      "hash": "871e545f48e91d18044b0e6160b8b223836ed51b"
+    },
+    "com.unity.2d.sprite": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    },
     "com.unity.ai.navigation": {
       "version": "2.0.8",
       "depth": 0,
