@@ -845,6 +845,10 @@ PrefabInstance:
       propertyPath: health
       value: 100
       objectReference: {fileID: 0}
+    - target: {fileID: 1746460921114067822, guid: 5960ce5db33ce43d8ac1a0b9313e15e9, type: 3}
+      propertyPath: minForceThreshold
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 3306477730643659844, guid: 5960ce5db33ce43d8ac1a0b9313e15e9, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.89170074
@@ -889,6 +893,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Table (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 6583789198238128895, guid: 5960ce5db33ce43d8ac1a0b9313e15e9, type: 3}
+      propertyPath: m_Material
+      value: 
+      objectReference: {fileID: 13400000, guid: 4edb143dbd64d45cdb01a8a524624c9e, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1163,6 +1171,10 @@ MonoBehaviour:
   minForceThreshold: 5
   verticalChangeThreshold: 1
   positionCheckInterval: 0.5
+  heavyMass: 1000
+  heavyDrag: 5
+  pushMass: 10
+  pushDrag: 0.5
 --- !u!54 &1711729125
 Rigidbody:
   m_ObjectHideFlags: 0
